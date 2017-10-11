@@ -1,0 +1,22 @@
+.row
+  .col-md-12
+    table.table.table-responsive
+      thead
+        tr
+          th IP
+          th MAC
+          th Vendor
+          th Ports
+          th Hostname
+          th OS
+      tbody
+        - @nmap_result.each_host do |host|
+          tr
+            td = host.ip
+            td = host.mac
+            td = host.vendor
+            td
+              - if host.ports.any? {|p| p.state == :open}
+                a href="http://#{host.ip}" = "http://#{host.ip}"
+            td = host.hostname
+            td = host.os&.fingerprint

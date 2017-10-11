@@ -16,7 +16,6 @@ html lang=I18n.locale
 
   body
     == include_gon
-    == render 'layouts/navigation'
     == flash_messages
     - if @without_container
       == yield

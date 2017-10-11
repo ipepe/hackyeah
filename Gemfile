@@ -71,5 +71,7 @@ gem 'slim-rails'
 gem 'gon'
 gem 'non-stupid-digest-assets'
 
+gem 'ruby-nmap', require: 'nmap'
+
 
 
