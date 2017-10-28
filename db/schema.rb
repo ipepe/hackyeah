@@ -12,6 +12,15 @@
 
 ActiveRecord::Schema.define(version: 20171028193456) do
 
+  create_table "documents", force: :cascade do |t|
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.string   "input_file_file_name"
+    t.string   "input_file_content_type"
+    t.integer  "input_file_file_size"
+    t.datetime "input_file_updated_at"
+  end
+
   create_table "teryt_locations", force: :cascade do |t|
     t.string   "street",     null: false
     t.float    "geomx",      null: false
