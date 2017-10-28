@@ -1,18 +1,10 @@
-default: &default
-  adapter: postgresql
-  encoding: unicode
-  database: <%= ENV.fetch('DB_NAME',     'webapp') %>
-  username: <%= ENV.fetch('DB_USERNAME', 'webapp')  %>
-  password: <%= ENV.fetch('DB_PASSWORD', 'webapp')  %>
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-
 development:
-  <<: *default
-  database: rails-app-starting-template_development
+  adapter: sqlite3
+  database: db/development.sqlite3
 
 test:
-  <<: *default
-  database: rails-app-starting-template_test
+  adapter: sqlite3
+  database: db/test.sqlite3
 
 production:
   adapter: postgresql
