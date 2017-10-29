@@ -3,20 +3,10 @@
     span.glyphicon.glyphicon-list-alt
     |  Back
   h3 Processing upload ##{@upload.id}...
-.container
-  .row: .col-md-12
-    .progress
-      #progressbar.progress-bar.progress-bar-striped.active role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:50%"
-        | 0%
 coffee:
-  setInterval( (->
+  interval = setInterval( (->
     $.ajax("/uploads/#{gon.upload_id}.json").done((data)->
       if data.status in ['finished','error']
-        window.location = "/uploads/#{gon.upload_id}"
-      else
-        progressBar = document.getElementById('progressbar')
-        progressBar.textContent = data.progress_percent + '%'
-        #progressBar.style.width = data.progress_percent + '%'
-        progressBar.attributes['aria-valuenow'].value = data.progress_percent
+        window.location = "/uploads/#{gon.upload_id}?success=true"
     )
   ), 1000)
