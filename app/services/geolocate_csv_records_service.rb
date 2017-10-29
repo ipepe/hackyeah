@@ -6,20 +6,26 @@ class GeolocateCSVRecordsService
 
   def initialize(csv_file)
     self.csv_file = csv_file
+    self.output = {}
   end
 
   def process
     success = 0
     failure = 0
 
-    Parallel.each(SmarterCSV.process(csv_file, col_sep: ';')) do |row|
-      if TerytLocationsIndex.find_address("#{row[:adres]} #{row[:ul]}").nil?
-        failure += 1
-      else
-        success += 1
+    self.output[:result] = Parallel.map(SmarterCSV.process(csv_file, col_sep: ';', chunk_size: 1000)) do |chunk|
+      chunk.map do |row|
+        address = TerytLocationsIndex.find_address("#{row[:adres]} #{row[:ul]}")
+        if address.present?
+          row[:address_id] = address.id
+          row[:address_found] = address.street
+        end
+        row
       end
-    end
-    @output = [success, failure].tap {|o| puts o.inspect }
+    end.flatten
 
+    self.output[:success] = success
+    self.output[:failure] = failure
+    self.output
   end
 end
