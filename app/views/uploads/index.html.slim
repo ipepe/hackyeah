@@ -13,10 +13,13 @@
         th
         th
         th
+        th
     tbody
       - @uploads.each do | upload |
         tr
           td = upload.id
+          td
+            = link_to 'Pick columns and process', pick_columns_upload_url(upload)
           td
             = link_to 'Show', upload
           td
