@@ -1,4 +1,6 @@
 # rubocop:disable all
+require 'csv'
+
 class GeolocateCSVRecordsService
   attr_accessor :csv_file, :output
 
@@ -7,13 +9,17 @@ class GeolocateCSVRecordsService
   end
 
   def process
-    lines = csv_file.read.split("\n")
-    headers = lines.unshift.split(';')
-    address_name_headers = ['Adres', 'UL', 'NR_BUD']
-    lines.each do |line|
-      # address string = join by address_name_headers
-      # x, y = TerytLocations.find_address(address_string)
+    success = 0
+    failure = 0
+
+    Parallel.each(SmarterCSV.process(csv_file, col_sep: ';')) do |row|
+      if TerytLocationsIndex.find_address("#{row[:adres]} #{row[:ul]}").nil?
+        failure += 1
+      else
+        success += 1
+      end
     end
-    @output = nil # TODO: real output
+    @output = [success, failure].tap {|o| puts o.inspect }
+
   end
 end
