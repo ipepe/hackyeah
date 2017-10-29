@@ -70,7 +70,11 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-bootswatch-sass'
 end
 
+gem 'activerecord-import'
 gem 'dotenv-rails'
 gem 'gon'
 gem 'non-stupid-digest-assets'
 gem 'slim-rails'
+gem 'chewy'
+gem 'smarter_csv'
+gem 'parallel'

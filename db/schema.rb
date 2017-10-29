@@ -31,12 +31,12 @@ ActiveRecord::Schema.define(version: 20171028220710) do
   end
 
   create_table "teryt_locations", force: :cascade do |t|
-    t.string   "address"
-    t.float    "geomx"
-    t.float    "geomy"
-    t.string   "code"
+    t.string   "street",     null: false
+    t.float    "geomx",      null: false
+    t.float    "geomy",      null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["street"], name: "index_teryt_locations_on_street"
   end
 
 end
