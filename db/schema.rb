@@ -10,15 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171028220710) do
+ActiveRecord::Schema.define(version: 20171029082927) do
 
-  create_table "document_columns", force: :cascade do |t|
-    t.string   "name",                    null: false
-    t.integer  "meaning",     default: 0, null: false
-    t.integer  "document_id"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-    t.index ["document_id"], name: "index_document_columns_on_document_id"
+  create_table "columns", force: :cascade do |t|
+    t.string   "name",                   null: false
+    t.integer  "meaning",    default: 0, null: false
+    t.integer  "upload_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.index ["upload_id"], name: "index_columns_on_upload_id"
   end
 
   create_table "teryt_locations", force: :cascade do |t|

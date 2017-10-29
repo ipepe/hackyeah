@@ -13,7 +13,7 @@
   .form-group
     = f.label :input_file, class: "col-sm-2 control-label"
     .col-sm-10
-      = f.file_field :input_file, class: "form-control"
+      = f.file_field :input_file, class: "form-control", required: 'required'
   .form-group
     .col-sm-offset-2.col-sm-10
       = f.submit class: "btn btn-primary"

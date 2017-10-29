@@ -6,7 +6,14 @@
 dl.dl-horizontal
   dt Status:
   dd= @upload.human_enum_name(:status)
-  dt Output File:
-  dd
-    - if @upload.output_file.present?
+  - if @upload.output_file.present?
+    dt Output File:
+    dd
       a href=@upload.output_file.url Download
+  - if @upload.errors_file.present?
+    dt Errors File:
+    dd
+      a href=@upload.errors_file.url Download
+    dt Report file:
+    dd
+      a href=report_upload_url(@upload) Download

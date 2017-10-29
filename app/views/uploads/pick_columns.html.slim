@@ -1,0 +1,9 @@
+== form_for(@upload) do |f|
+  = f.submit 'Submit'
+  == check_box_tag :picked_columns, '1', true, hidden: true
+  table.table.table-responsive
+    tbody
+      = f.fields_for :columns do |ff|
+        tr
+          td = ff.object.name
+          td = ff.select :meaning, ff.object.class.meanings.keys

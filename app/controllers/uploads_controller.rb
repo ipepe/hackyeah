@@ -1,5 +1,5 @@
 class UploadsController < ApplicationController
-  before_action :set_upload, only: [:show, :edit, :update, :destroy]
+  before_action :set_upload, only: [:show, :edit, :update, :destroy, :pick_columns, :report, :geocode_process]
 
   # GET /uploads
   # GET /uploads.json
@@ -12,7 +12,7 @@ class UploadsController < ApplicationController
   def show
     respond_to do |format|
       format.html { render :show }
-      format.json { render json: { status: @upload.status } }
+      format.json { render json: { status: @upload.status, progress_percent: @upload.progress_percent } }
     end
   end
 
@@ -27,9 +27,11 @@ class UploadsController < ApplicationController
   # POST /uploads
   # POST /uploads.json
   def create
-    @upload = Upload.new(upload_params)
-    if @upload.save
-      redirect_to pick_columns_upload_url(@upload)
+    @upload = Upload.create(upload_params)
+    @upload.update(rows_in_input_file: @upload.calculate_all_rows)
+    @upload.update(columns_attributes: @upload.headers_from_input_file.map { |h| { name: h } })
+    if @upload.save && @upload.valid?
+      redirect_to pick_columns_upload_url(@upload), notice: 'Please select street name and number columns for geocoding'
     else
       render :new
     end
@@ -38,15 +40,34 @@ class UploadsController < ApplicationController
   # PATCH/PUT /uploads/1
   # PATCH/PUT /uploads/1.json
   def update
-    respond_to do |format|
-      if @upload.update(upload_params)
-        format.html { redirect_to @upload, notice: 'Upload was successfully updated.' }
-        format.json { render :show, status: :ok, location: @upload }
+    @upload.update(upload_params)
+    if @upload.valid?
+      if !!params['picked_columns']
+        redirect_to geocode_process_upload_url(@upload), notice: 'Upload started processing'
       else
-        format.html { render :edit }
-        format.json { render json: @upload.errors, status: :unprocessable_entity }
+        redirect_to @upload, notice: 'Upload was successfully updated.'
+      end
+    else
+      if !!params['picked_columns']
+        redirect_to pick_columns_upload_url(@upload), alert: 'Please select street name and number columns for geocoding'
+      else
+        render :edit
       end
     end
+  end
+
+  def geocode_process
+    gon.upload_id = @upload.id
+    if @upload.status.to_s != 'initial'
+      redirect_to @upload, notice: 'Upload already processed'
+    else
+      GeocodeJob.perform_later(@upload.id)
+      render :geocode_process
+    end
+  end
+
+  def report
+    send_data @upload.report_file_content, filename: 'report.txt'
   end
 
   # DELETE /uploads/1
@@ -68,6 +89,6 @@ class UploadsController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def upload_params
-    params.require(:upload).permit(:name)
+    params.require(:upload).permit(:input_file, columns_attributes: [:id, :meaning])
   end
 end

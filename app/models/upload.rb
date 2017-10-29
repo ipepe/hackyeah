@@ -1,3 +1,5 @@
+require 'csv'
+
 class Upload < ApplicationRecord
   has_attached_file :input_file
   has_attached_file :output_file
@@ -9,40 +11,84 @@ class Upload < ApplicationRecord
 
   enum status: [:initial, :started, :finished, :error]
 
-  def process
+  has_many :columns
+
+  accepts_nested_attributes_for :columns
+
+  after_initialize do
+    if input_file.present? && rows_in_input_file == 0
+      self.rows_in_input_file = calculate_all_rows
+    end
+  end
+
+  # validate do
+  #   if columns.exists? && !columns.where.not(meaning: 'no_meaning').exists?
+  #     errors.add :columns, 'You need to select proper column names'
+  #   end
+  # end
+
+  def calculate_all_rows
+    `wc -l #{input_file.path}`.to_i
+  end
+
+  def process # rubocop:disable Metrics/MethodLength
+    # return :already_finished if status.to_s != 'initial'
     update(time_started_processing: Time.current, status: :started)
     begin
-      csv_chunks = SmarterCSV.process(input_file.path, col_sep: ';', chunk_size: 500, keep_original_headers: true)
-      Parallel.map(csv_chunks) do |chunk|
-        chunk.map do |row|
-          increment(:rows_in_input_file)
-          address = TerytLocation.find_address("#{row[:adres]} #{row[:ul]}")
-          if address.present?
-            increment(:successfully_processed_rows)
-            row[:address_id] = address.id
-            row[:address_found] = address.street
+      input_csv = CSV.read(input_file.path, headers: true, col_sep: ';')
+      tmp_output_file = Tempfile.new(['output', '.csv'], encoding: 'utf-8')
+      tmp_errors_file = Tempfile.new(['error', '.csv'], encoding: 'utf-8')
+      name_columns = if columns.find_by(meaning: 'street_name_and_number_combined')
+                       [columns.find_by(meaning: 'street_name_and_number_combined').name]
+                     else
+                       [
+                         columns.find_by(meaning: 'street_name').name,
+                         columns.find_by(meaning: 'street_number').name
+                       ]
+                     end
+
+      CSV.open(tmp_errors_file.path, 'w') do |error_csv|
+        error_csv << input_csv.headers
+
+        CSV.open(tmp_output_file.path, 'w') do |output_csv|
+          output_csv << input_csv.headers.concat(['geomx', 'geomy'])
+
+          input_csv.each do |row|
+            address_string = name_columns.map { |nc| row[nc] }.join(' ')
+            address = TerytLocation.find_address(address_string)
+            if address.present?
+              increment(:successfully_processed_rows)
+              output_csv << row.fields.concat([address.geomx, address.geomy])
+            else
+              error_csv << row.fields
+            end
+            row
           end
-          row
         end
-      end.flatten
+      end
+      self.output_file = tmp_output_file
+      self.errors_file = tmp_errors_file
       update(time_ended_processing: Time.current, status: :finished)
-    rescue
-      update(time_started_processing: Time.current, status: :error)
+    rescue => e
+      puts e.message
+      update(time_ended_processing: Time.current, status: :error)
     end
+    self
   end
 
   def headers_from_input_file
     File.readlines(input_file.path).first.split(';')
   end
 
-  # output file = input file.reduce failures + columns
-  # error_file = input file reduce sucesses
+  def progress_percent
+    (successfully_processed_rows / rows_in_input_file * 100).to_i
+  end
 
   def report_file_content
     <<~TXT
       Time started: #{time_started_processing}
       Time ended: #{time_ended_processing}
-      Seconds for processing: #{time_ended_processing - time_started_processing}
+      Seconds for processing: #{(time_ended_processing - time_started_processing).to_i}
 
       Rows in input file: #{rows_in_input_file}
       Sucesses: #{successfully_processed_rows}

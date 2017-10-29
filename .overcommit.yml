@@ -1,4 +1,4 @@
-PreCommit:
-  RuboCop:
-    enabled: true
-    command: ['bundle', 'exec', 'rubocop', '-a'] # Invoke within Bundler contextxt
+#PreCommit:
+#  RuboCop:
+#    enabled: true
+#    command: ['bundle', 'exec', 'rubocop', '-a'] # Invoke within Bundler contextxt
