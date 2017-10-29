@@ -1,0 +1,12 @@
+.page-header
+  = link_to uploads_path, class: 'btn btn-default' do 
+    span.glyphicon.glyphicon-list-alt
+    |  Back
+  h3 Upload ##{@upload.id}
+dl.dl-horizontal
+  dt Status:
+  dd= @upload.human_enum_name(:status)
+  dt Output File:
+  dd
+    - if @upload.output_file.present?
+      a href=@upload.output_file.url Download

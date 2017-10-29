@@ -41,8 +41,8 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
   gem 'overcommit'
-  gem 'sqlite3'
   gem 'pry-rails'
+  gem 'sqlite3'
 end
 
 group :development do
@@ -71,10 +71,11 @@ source 'https://rails-assets.org' do
 end
 
 gem 'activerecord-import'
+gem 'bootstrap-generators'
+gem 'chewy'
 gem 'dotenv-rails'
 gem 'gon'
 gem 'non-stupid-digest-assets'
-gem 'slim-rails'
-gem 'chewy'
-gem 'smarter_csv'
 gem 'parallel'
+gem 'slim-rails'
+gem 'smarter_csv'

@@ -58,6 +58,8 @@ GEM
     arel (7.1.4)
     ast (2.3.0)
     bindex (0.5.0)
+    bootstrap-generators (3.3.4)
+      railties (>= 3.1.0)
     builder (3.2.3)
     byebug (9.1.0)
     capistrano (3.9.1)
@@ -270,6 +272,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-import
+  bootstrap-generators
   byebug
   capistrano
   capistrano-bundler

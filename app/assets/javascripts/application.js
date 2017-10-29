@@ -13,6 +13,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require bootstrap-sass-official
+//= require bootstrap
 //= require_tree .
 
 jQuery(function($) {

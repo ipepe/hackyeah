@@ -20,4 +20,14 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  application:
+    title: X-City Cracow - HackYeah
+    name: X-City Cracow - HackYeah
+  activerecord:
+    attributes:
+      upload:
+        statuses:
+          initial: Queued
+          started: Started processing
+          finished: Finished processing
+          error: Processing encountered error

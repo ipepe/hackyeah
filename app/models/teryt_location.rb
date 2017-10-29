@@ -1,7 +1,6 @@
 class TerytLocation < ApplicationRecord
-  def self.find_address(_address_string)
-    # adress_string = address_string.to_can.downcase
-    [42, 24]
+  def self.find_address(address)
+    TerytLocationsIndex.find_address(clean(address))
   end
 
   def self.clean(address)
@@ -11,7 +10,7 @@ class TerytLocation < ApplicationRecord
     end
     result = result.parameterize.gsub(/[-\/.]/, ' ')
     %w[al ul os pl].each do |c|
-      if result.start_with?(c+' ')
+      if result.start_with?(c + ' ')
         result = result[3..-1]
       end
       result.gsub(/\A#{c} /, '')
