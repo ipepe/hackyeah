@@ -1,0 +1,9 @@
+== form_for(@document) do |f|
+  = f.submit 'Submit'
+  table.table.table-responsive
+    tbody
+      = f.fields_for :document_columns do |ff|
+        tr
+          td = ff.object.name
+          td = ff.select :meaning, ff.object.class.meaning_statuses
+          	/=select_tag("header_#{i}", options_for_select([[nil], ['ulica'], ['numer domu'], ['numer czegoś']]))

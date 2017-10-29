@@ -1,6 +1,6 @@
 class UploadController < ApplicationController
   def create
-    Document.create(input_file: params.fetch(:file))
-    head :ok
+    document = Document.create_from(params.fetch(:file))
+    redirect_to(pick_address_path(document.id))
   end
 end

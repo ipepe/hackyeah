@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171028193456) do
+ActiveRecord::Schema.define(version: 20171028220710) do
+
+  create_table "document_columns", force: :cascade do |t|
+    t.string   "name",                    null: false
+    t.integer  "meaning",     default: 0, null: false
+    t.integer  "document_id"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.index ["document_id"], name: "index_document_columns_on_document_id"
+  end
 
   create_table "documents", force: :cascade do |t|
     t.datetime "created_at",              null: false
