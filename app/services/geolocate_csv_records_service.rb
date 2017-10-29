@@ -13,9 +13,9 @@ class GeolocateCSVRecordsService
     success = 0
     failure = 0
 
-    self.output[:result] = Parallel.map(SmarterCSV.process(csv_file, col_sep: ';', chunk_size: 1000)) do |chunk|
+    self.output[:result] = Parallel.map(SmarterCSV.process(csv_file, col_sep: ';', chunk_size: 500)) do |chunk|
       chunk.map do |row|
-        address = TerytLocationsIndex.find_address("#{row[:adres]} #{row[:ul]}")
+        address = TerytLocationsIndex.find_address(TerytLocation.clean("#{row[:adres]} #{row[:ul]}"))
         if address.present?
           row[:address_id] = address.id
           row[:address_found] = address.street
